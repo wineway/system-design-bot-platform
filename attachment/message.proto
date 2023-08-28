@@ -1,0 +1,40 @@
+message UserInfo {
+    required string user_token = 1;
+    required string user_id = 2;
+}
+
+message BotInfo {}
+
+// pass through and modified fields across various service
+message ChatEvent {
+    required int32 event_type = 1;
+    optional string lastest_message = 2;
+    required UserInfo user_info = 3;
+    required BotInfo bot_info = 4;
+    // latest message id
+    required int64 message_id = 5;
+    // whether next step operation need load whole conversation 
+    // from cache service to make next decision
+    optional bool require_context = 6;
+}
+
+
+
+message ChatMessage {
+    required int64 message_id = 1;
+    required bool from_user = 2;
+    required string message_content = 3;
+    required int64 timestamp = 4;
+}
+
+// store & persist in cache service
+// redis hash:
+//           key: conversation_id
+//               element_key: [message_ids] ++ user_id ++ bot_id
+// cassandra key: conversation_id ++ element_key
+message Conversation {
+    required string user_id = 1;
+    required string bot_id = 2;
+    required string conversation_id = 3;
+    repeated ChatMessage messages = 4;
+}
